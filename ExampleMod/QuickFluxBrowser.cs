@@ -77,7 +77,9 @@ public class QuickFluxBrowser : ResoniteMod {
 			if (__instance.GetKeyDown(Key.I)) {
 				ITool tool = Engine.Current.WorldManager.FocusedWorld.LocalUser.GetActiveTool();
 				if (tool is ProtoFluxTool) {
-					protoflux_Browser.Invoke(tool, new object[] { null, null });
+					Engine.Current.WorldManager.FocusedWorld.RunSynchronously(() => {
+						protoflux_Browser.Invoke(tool, new object[] { null, null });
+					});
 				}
 			}
 		}
