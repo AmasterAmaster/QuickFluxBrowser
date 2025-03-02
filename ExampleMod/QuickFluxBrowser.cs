@@ -17,7 +17,8 @@ public class QuickFluxBrowser : ResoniteMod {
 	const string harmonyId = "com.AmasterAmaster.QuickFluxBrowser";
 	static ModConfiguration config;
 
-	public override void OnEngineInit() {
+	public override void OnEngineInit()
+	{
 		HotReloader.RegisterForHotReload(this);
 
 		// Get the config if needed
@@ -29,7 +30,8 @@ public class QuickFluxBrowser : ResoniteMod {
 
 	// This is the method that should be used to unload your mod
 	// This means removing patches, clearing memory that may be in use etc.
-	static void BeforeHotReload() {
+	static void BeforeHotReload()
+	{
 		// Unpatch Harmony
 		Harmony harmony = new Harmony(harmonyId);
 		harmony.UnpatchAll(harmonyId);
@@ -39,7 +41,8 @@ public class QuickFluxBrowser : ResoniteMod {
 
 	// This is called in the newly loaded assembly
 	// Load your mod here like you normally would in OnEngineInit
-	static void OnHotReload(ResoniteMod modInstance) {
+	static void OnHotReload(ResoniteMod modInstance)
+	{
 		// Get the config if needed
 		config = modInstance.GetConfiguration();
 
@@ -47,37 +50,28 @@ public class QuickFluxBrowser : ResoniteMod {
 		Setup();
 	}
 
-	static void Setup() {
+	static void Setup()
+	{
 		// Patch Harmony
 		Harmony harmony = new Harmony(harmonyId);
 		harmony.PatchAll();
 	}
 
-	/*[HarmonyPatch(typeof(ProtoFluxTool), "OpenNodeBrowser", typeof(IButton), typeof(ButtonEventData))]
-	//MethodInfo(typeof(ProtoFluxTool), "OpenNodeBrowser", typeof(IButton), typeof(ButtonEventData));
+	[HarmonyPatch(typeof(InputInterface), "Update", typeof(float))]
 	class QuickFluxBrowserPatch
 	{
-		// Print a message when something happens (Just for example)
-		public static void Postfix(ProtoFluxTool __instance)
-		{
-			//When "I" is pressed...
-			if(Engine.Current.InputInterface.GetKeyDown(Key.I))
-			{
-				__instance.LocalUser.
-			}
-		}
-	}*/
-
-	[HarmonyPatch(typeof(InputInterface), "Update", typeof(float))]
-	class QuickFluxBrowserPatch {
 		public static MethodInfo protoflux_Browser = AccessTools.Method(typeof(ProtoFluxTool), "OpenNodeBrowser", new System.Type[] { typeof(IButton), typeof(ButtonEventData) });
 
 		// Print a message when something happens (Just for example)
-		public static void Postfix(InputInterface __instance) {
-			if (__instance.GetKeyDown(Key.I)) {
+		public static void Postfix(InputInterface __instance)
+		{
+			if(__instance.GetKeyDown(Key.I))
+			{
 				ITool tool = Engine.Current.WorldManager.FocusedWorld.LocalUser.GetActiveTool();
-				if (tool is ProtoFluxTool) {
-					Engine.Current.WorldManager.FocusedWorld.RunSynchronously(() => {
+				if(tool is ProtoFluxTool && !Engine.Current.WorldManager.FocusedWorld.LocalUser.HasActiveFocus())
+				{
+					Engine.Current.WorldManager.FocusedWorld.RunSynchronously(() =>
+					{
 						protoflux_Browser.Invoke(tool, new object[] { null, null });
 					});
 				}
